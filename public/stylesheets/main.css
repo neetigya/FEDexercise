@@ -79,13 +79,38 @@ button {
 	border-radius: 2px;
 	background: navajowhite;
 	font-weight: 600;
-	margin: 0 5px;
+	margin: 3px;
 	height: 30px;
 	width: 190px;
 }
 
 #navbar-buttons button:hover {
 	background: #FFBF61;
+}
+
+@media(max-width: 1024px){
+	#navbar-buttons button {
+		width: 20%;
+	}
+}
+
+@media(max-width: 960px){
+	#navbar-buttons button {
+		min-width: 25%;
+	}
+}
+
+@media(max-width: 768px){
+	#navbar-buttons button {
+		width: 50%;
+	}
+}
+
+@media(max-width: 418px){
+	#navbar-buttons button {
+		width: 50%;
+		height: 40px;
+	}
 }
 /*container*/
 
@@ -137,4 +162,53 @@ button {
 
 h3 span {
 	color: #C63D0F;
+}
+
+@media(max-width: 1024px){
+
+	#images	div {
+		width: 80%;
+		margin: 0 auto 30px auto;
+	}
+	#images	div img{
+
+		margin: auto;
+	}
+}
+
+@media(max-width: 960px){
+	    #container{
+	    	width: 100%;
+	    }
+	#images	div {
+		width: 60%;
+		margin: 0 auto 30px auto;
+	}
+	#images	div img{
+		width: 80%;
+		margin: auto;
+	}
+	
+}
+
+@media(max-width: 768px){
+	#images	div {
+		width: 60%;
+		margin: 0 auto 30px auto;
+	}
+	#images	div img{
+		width: 80%;
+		margin: auto;
+	}
+}
+
+@media(max-width: 418px){
+	#images	div {
+		width: 100%;
+		margin: 0 auto 30px auto;
+	}
+	#images	div img{
+		width: 80%;
+		margin: auto;
+	}
 }
