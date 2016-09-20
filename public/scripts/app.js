@@ -1,3 +1,4 @@
+
 /* Global Private Variables */
 	
 	/*private_api_key, private_user_id,private_format **must be** kept unchanged 
@@ -18,6 +19,14 @@
 	var imageURL = "";
 /*Global Private Variables End*/
 
+/*timeConverter function coverts time from unix timestamp to readable date format*/
+
+function timeConverter(unix_timestamp){
+	var date = new Date(unix_timestamp*1000);
+	var formattedDate = "0"+ date.getMonth()+ " : " + date.getDate()+ " : " + date.getFullYear() +
+						" "+ date.getHours()+ " : " + date.getMinutes()+ " : " + date.getSeconds();
+    return formattedDate;
+}
 
 /* callBackOnPageLoad function is to complete 
  * the image URL and sending the cooncatenated URL's to the DOM  
@@ -67,6 +76,14 @@ var callBackAfterSorting = function(text,extras){
 			var server = text[i]["server"];
 			var secret = text[i]["secret"];
 			var read = text[i][readProperty[extras]];
+			//console.log(extras)
+			
+			/* if it is date_upload convert it into readable date format
+			 */
+			if(extras == "date_upload"){
+				read = timeConverter(read); 
+			}
+			
 			urlDefault = 'https://farm' + farm + '.staticflickr.com/' + server + '/' + id + '_' + secret + '.jpg'
 			imageURL += '<div><img src = "' + urlDefault + '" alt ="sorry could not load images" >' +
 						'<h3>'+viewDescription[extras]+" : <span>"+read +'</span><h3></div>';
@@ -122,9 +139,13 @@ function getText(pageNO, extras){
 */
 
 var passedSort = "description"; 
-	function setExtras(sortBy){
+function setExtras(sortBy){
 	this.passedSort = sortBy; 
 }
+
+/*Event Handler that fires up everytime user hits the bottom of the page 
+ *as a result more contents are loaded by incrementing current page variable
+ */
 
 window.addEventListener("scroll", function(event){
 	var wrapper = document.getElementById("images");
@@ -134,7 +155,6 @@ window.addEventListener("scroll", function(event){
 	if(y >= contentHeight-200){
 		currentPage += 1 ;
 		getText(currentPage, passedSort);
-		
 		event = event || window.event 
 		if (event.stopPropagation) {
 		        event.stopPropagation()
@@ -156,14 +176,15 @@ for (var i = 0; i < lis.length; i++) {
 			getText(1, sortBy);	
 	}); 
 }	
-
+/* This function is called when buttons are clicked to sort
+ * the returned sorted values are passed to callBackAfterSorting function
+ */
 function Sort(jsonToSort,sortCriteria){
-	var x = jsonToSort["photos"]["photo"]
-	x.sort(function(a,b){
+	var sorted = jsonToSort["photos"]["photo"]
+	sorted.sort(function(a,b){
 		return a[sortCriteria] - b[sortCriteria];
 	});
-	
-	return x;
+	return sorted;
 }
 
 /* page load event for the first time page loads pass 1 as page no to be fetched
