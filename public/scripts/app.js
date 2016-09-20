@@ -19,6 +19,62 @@
 /*Global Private Variables End*/
 
 
+/* callBackOnPageLoad function is to complete 
+ * the image URL and sending the cooncatenated URL's to the DOM  
+ * to render onto the webpage
+ * @param text - parameter response to the http request in the form of JSON
+ * @param extras - extras to get Various Fields from API default is "description", used to sort 
+ * callBackAfterSorting function triggers when sorting is requested takes parameter extras as sort by value
+ */
+
+var callBackOnPageLoad = function(text,extras){
+		
+		var imagePathBuilder = text["photos"]["photo"]; 
+		var urlDefault = "";
+		for (let i = 0; i < text["photos"]["photo"].length; i++) {
+			var id = imagePathBuilder[i]["id"];
+			var farm = imagePathBuilder[i]["farm"];
+			var server = imagePathBuilder[i]["server"];
+			var secret = imagePathBuilder[i]["secret"];
+			var title = imagePathBuilder[i]["title"];
+			var description = imagePathBuilder[i][extras];
+			urlDefault = 'https://farm' + farm + '.staticflickr.com/' + server + '/' + id + '_' + secret + '.jpg'
+			imageURL += '<div> <img src = "' + urlDefault + '" alt ="sorry could not load images" >'+ 
+						'<h3>'+ title +'</h3>'+
+						'<p>'+ description["_content"] + '</p></div>';
+		}
+		
+		document.getElementById("images").innerHTML = imageURL;
+}
+
+var callBackAfterSorting = function(text,extras){
+		var viewDescription = {
+
+			"date_upload" : "date upload",
+			"date_taken" : "date taken", 
+			"views" : "views"
+		}
+		var readProperty = {
+			"date_upload" : "dateupload",
+			"date_taken" : "datetaken", 
+			"views" : "views"
+		}
+		
+		var urlDefault = "";
+		imageURL = "";
+		for (let i = 0; i < text.length; i++) {
+			var id = text[i]["id"];
+			var farm = text[i]["farm"];
+			var server = text[i]["server"];
+			var secret = text[i]["secret"];
+			var read = text[i][readProperty[extras]]
+			urlDefault = 'https://farm' + farm + '.staticflickr.com/' + server + '/' + id + '_' + secret + '.jpg'
+			imageURL += '<div><img src = "' + urlDefault + '" alt ="sorry could not load images" >' +
+						'<h3>'+viewDescription[extras]+" : <span>"+read +'</span><h3></div>'
+		}
+		document.getElementById("images").innerHTML = "";
+		document.getElementById("images").innerHTML = imageURL;
+}
 
 
 /* function getText is responsible to send HTTP get request to get the requested data based on the parameters passed
@@ -30,7 +86,6 @@
 */
 
 function getText(pageNO, extras){
-	
 	var request; 
 	if (window.XMLHttpRequest) {
 	    	request = new XMLHttpRequest();
@@ -38,7 +93,9 @@ function getText(pageNO, extras){
 	    else {
 	  	    request = new ActiveXObject("Microsoft.XMLHTTP");
 		}
-	var URL = "https://api.flickr.com/services/rest/?method=flickr.people.getPublicPhotos&"+private_api_key+"&"+private_user_id+"&"+private_format+"&per_page=55&page="+pageNO+"&extras="+extras;
+	var URL = "https://api.flickr.com/services/rest/?method=flickr.people.getPublicPhotos&"+
+			   private_api_key+"&"+private_user_id+"&"+private_format+
+			   "&per_page=55&page="+pageNO+"&extras="+extras;
 	
 	request.onreadystatechange = function(){
 		if(request.readyState === 4 && request.status === 200){
@@ -56,3 +113,5 @@ function getText(pageNO, extras){
 	request.open("GET", URL,true);
 	request.send();
 }
+
+window.onload= getText(1, extras)
