@@ -197,3 +197,8 @@ var homeButton = document.getElementById("home");
 	homeButton.addEventListener("click", function(){
 	location.href = "index.html";
 });
+
+var aboutMe = document.getElementById("aboutMe");
+	aboutMe.addEventListener("click", function(){
+	window.location.href = "http://neetigya.bitballoon.com/";
+});
