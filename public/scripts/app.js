@@ -49,7 +49,6 @@ var callBackOnPageLoad = function(text,extras){
 
 var callBackAfterSorting = function(text,extras){
 		var viewDescription = {
-
 			"date_upload" : "date upload",
 			"date_taken" : "date taken", 
 			"views" : "views"
@@ -67,10 +66,10 @@ var callBackAfterSorting = function(text,extras){
 			var farm = text[i]["farm"];
 			var server = text[i]["server"];
 			var secret = text[i]["secret"];
-			var read = text[i][readProperty[extras]]
+			var read = text[i][readProperty[extras]];
 			urlDefault = 'https://farm' + farm + '.staticflickr.com/' + server + '/' + id + '_' + secret + '.jpg'
 			imageURL += '<div><img src = "' + urlDefault + '" alt ="sorry could not load images" >' +
-						'<h3>'+viewDescription[extras]+" : <span>"+read +'</span><h3></div>'
+						'<h3>'+viewDescription[extras]+" : <span>"+read +'</span><h3></div>';
 		}
 		document.getElementById("images").innerHTML = "";
 		document.getElementById("images").innerHTML = imageURL;
@@ -82,7 +81,8 @@ var callBackAfterSorting = function(text,extras){
  * new page will be loaded	
  * @param extras - Default is "description" that fetched the image description displayed on the home page 
  * the extras parameter passed to the API URL gets other requested informations as well such as 
- * date upload, date taken and no of views, based on API documentation 	
+ * date upload, date taken and no of views, based on API documentation 
+ * per_page field specifies the photos loaded per page. is set to 25 in the variable URL	
 */
 
 function getText(pageNO, extras){
@@ -95,7 +95,7 @@ function getText(pageNO, extras){
 		}
 	var URL = "https://api.flickr.com/services/rest/?method=flickr.people.getPublicPhotos&"+
 			   private_api_key+"&"+private_user_id+"&"+private_format+
-			   "&per_page=55&page="+pageNO+"&extras="+extras;
+			   "&per_page=25&page="+pageNO+"&extras="+extras;
 	
 	request.onreadystatechange = function(){
 		if(request.readyState === 4 && request.status === 200){
@@ -114,4 +114,65 @@ function getText(pageNO, extras){
 	request.send();
 }
 
-window.onload= getText(1, extras)
+/* current page specifies the page no field of API
+ * event listener for scroll event as user reaches to the bottom of the page
+ * few pages are loaded, per page 25 photos with descriptions are loaded
+ *
+ *
+*/
+
+var passedSort = "description"; 
+	function setExtras(sortBy){
+	this.passedSort = sortBy; 
+}
+
+window.addEventListener("scroll", function(event){
+	var wrapper = document.getElementById("images");
+	var contentHeight = wrapper.offsetHeight;
+	var yOffset = window.pageYOffset; 
+	var y = yOffset + window.innerHeight; 
+	if(y >= contentHeight-200){
+		currentPage += 1 ;
+		getText(currentPage, passedSort);
+		
+		event = event || window.event 
+		if (event.stopPropagation) {
+		        event.stopPropagation()
+		} else {
+		        event.cancelBubble = true; //for IE
+		    }
+		event.preventDefault(); 
+		}
+}, true);
+
+
+/*Event Handler that fires up everytime sort buttons are clicked*/
+
+var lis = document.getElementsByClassName("sortBy");	
+for (var i = 0; i < lis.length; i++) {
+		lis[i].addEventListener("click", function(){
+			var sortBy = this.getAttribute("name");
+			setExtras(sortBy);
+			getText(1, sortBy);	
+	}); 
+}	
+
+function Sort(jsonToSort,sortCriteria){
+	var x = jsonToSort["photos"]["photo"]
+	x.sort(function(a,b){
+		return a[sortCriteria] - b[sortCriteria];
+	});
+	
+	return x;
+}
+
+/* page load event for the first time page loads pass 1 as page no to be fetched
+ * and extras as description	
+ */
+window.onload= getText(1, extras);
+/* event handling at the click of home button reload the homepage	
+*/
+var homeButton = document.getElementById("home");
+	homeButton.addEventListener("click", function(){
+	location.href = "index.html";
+});
